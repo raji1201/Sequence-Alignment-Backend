@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Protein alignment tutor</title>
+</head>
+<body>
+  <h1>Protein alignment tutor.</h1>
+  <h2>Alignment parameters</h2>
+  
+  <h3>Global Alignment</h3>
+  <form action="/global" method="POST">
+    <input type="text" placeholder="Query String" name="query"><br><br>
+    <input type="text" placeholder="Database String" name="database"><br><br>
+    <input type="number" placeholder="Gap Penalty" name="gap"><br><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <h3>Local Alignment</h3>
+  <form action="/local" method="POST">
+    <input type="text" placeholder="Query String" name="query"><br><br>
+    <input type="text" placeholder="Database String" name="database"><br><br>
+    <input type="number" placeholder="Gap Penalty" name="gap"><br><br>
+    <button type="submit">Submit</button>
+  </form>
+  <br>
+  <form action="/users" method="GET">
+    <button type="submit">See result</button>
+  </form>
+</body>
+</html>
