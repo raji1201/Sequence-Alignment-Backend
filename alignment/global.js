@@ -10,7 +10,7 @@ const scoringMatrix = [
 var alphabet = 'ACGT';
 const alignment = 'global';
 
-var getGlobalAlignment = (query, database, gap) => {
+var getGlobalAlignment = (query, database, gap, userScore) => {
 	
 	var globalAlignmentResult = {
 		score: NaN,
@@ -103,12 +103,23 @@ var getGlobalAlignment = (query, database, gap) => {
 		j--;
 	}
 
-	globalAlignmentResult.score = matrix[m-1][n-1];
+	var alignmentScore = matrix[m-1][n-1];
+	absAlignmentScore = Math.abs(alignmentScore);
+	absUserScore = Math.abs(userScore);
+
+	if (absAlignmentScore !== absUserScore) {
+		userScore = ((absAlignmentScore - (absAlignmentScore - absUserScore)) / absAlignmentScore * 100);
+	} else if (absAlignmentScore === absUserScore) {
+		userScore = 100;
+	}
+
+	globalAlignmentResult.score = alignmentScore;
 	globalAlignmentResult.queryStart = 0;
 	globalAlignmentResult.databaseStart = 0;
 	globalAlignmentResult.alignedQuery = queryString;
 	globalAlignmentResult.alignedDatabase = databaseString;
 	globalAlignmentResult.matrix = matrix;
+	globalAlignmentResult.userScore = userScore;
 
 	console.log(matrix[m-1][n-1]);
 	console.log('Aligned Query String: ' + queryString + '\n Aligned Database String: ' + databaseString);

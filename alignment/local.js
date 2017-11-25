@@ -11,7 +11,7 @@ var alphabet = 'ACGT';
 
 const alignment = 'local';
 
-var getLocalAlignment = (query, database, gap) => {
+var getLocalAlignment = (query, database, gap, userScore) => {
 
 	var localAlignmentResult = {
 		score: NaN,
@@ -132,12 +132,23 @@ var getLocalAlignment = (query, database, gap) => {
 		j--;
 	}
 
+	var alignmentScore = matrix[maxI][maxJ];
+	absAlignmentScore = Math.abs(alignmentScore);
+	absUserScore = Math.abs(userScore);
+
+	if (absAlignmentScore !== absUserScore) {
+		userScore = ((absAlignmentScore - (absAlignmentScore - absUserScore)) / absAlignmentScore * 100);
+	} else if (absAlignmentScore === absUserScore) {
+		userScore = 100;
+	}
+
 	localAlignmentResult.score = matrix[maxI][maxJ];
 	localAlignmentResult.queryStart = queryStart;
 	localAlignmentResult.databaseStart = databaseStart;
 	localAlignmentResult.alignedQuery = queryString;
 	localAlignmentResult.alignedDatabase = databaseString;
 	localAlignmentResult.matrix = matrix;
+	localAlignmentResult.userScore = userScore;
 
 	console.log(matrix[maxI][maxJ]);
 	console.log('Query start: ' + queryStart + ' Database start: ' + databaseStart);

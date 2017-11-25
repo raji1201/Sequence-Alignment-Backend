@@ -15,19 +15,16 @@ module.exports = {
 	createUsers: function (req, res, next) {
 		var person = req.body;
 
-		if (person.fullName && person.email && person.password && person.verifyPassword) {
-			
-			if (person.password !== person.verifyPassword) {
-				res.status(204);
-				res.end();
-			}
-
+		if (person.password !== person.verifyPassword) {
+			res.status(204);
+			res.end("Passwords do not match!");
+		} else if (person.fullName && person.email && person.password && person.verifyPassword) {
 			var userData = { 
 				fullName: person.fullName, 
-				password: person.password, 
+				password: person.password,
+				verifyPassword: person.verifyPassword, 
 				email: person.email 
 			}
-
 			User.create (userData, function (err, user) {
 				if (err) {
 					res.status(504);
@@ -38,70 +35,92 @@ module.exports = {
 					res.end();  
 				}
 			});
-		}
+		} else {
+    		var err = new Error('All fields required.');
+    		err.status = 400;
+    		return next(err);
+  		}
 	},
 
-	login: function (req, res) {
+	login: function (req, res, next) {
 		var person = req.body;
-		console.log(req.body);
-		User.
-			findOne().
-			where('email').equals(person.email).
-			select('fullName email').
-			exec(function (err, person) {
+		if (person.email && person.password) {
+				User.authenticate(person.email, person.password, function (error, user) {
+      				if (error || !user) {
+       					var err = new Error('Wrong email or password.');
+        				err.status = 401;
+        				return next(err);
+      				} else {
+				        req.session.userId = user._id;
+				        res.status(200);
+				        res.end(JSON.stringify(user));
+      				}
+    		});
+		} else {
+    		var err = new Error('All fields required.');
+    		err.status = 400;
+    		return next(err);
+  		}
+	},
+
+	logout: function (req, res, next) {
+		if (req.session) {
+			req.session.destroy(function (err) {
 				if (err) {
-					res.status(504);
-					res.end(err);
+					return next(err);
 				}
 				else {
-					console.log(person);
-					res.end(JSON.stringify(person.fullName));
+					res.status(200);
+					res.end();
 				}
-			});
-	},
-	seeResults: function (req, res, next) {
-	User.find({}, function (err, docs) {
-		if (err) {
-		res.status(504);
-		res.end(err);
-		} else {
-		for (let i = 0; i < docs.length; i++) {
-		 console.log('user:', docs[i].fullName);
+			})
 		}
-		res.end(JSON.stringify(docs));
-		}
-	});
 	},
 
-	leaderBoard: function (req, res, next) {
-	LeaderBoard.find({}, function (err, docs) {
-		if (err) {
-			res.status(504);
-			res.end(err);
-		} else {
-			for (let i = 0; i < docs.length; i++) {
-				console.log(`user: ${docs[i].fullName} score: ${docs[i].score}`);
+	updateScore: function (userId, userScore) {
+		console.log(userId);
+		User.findById(userId, function (err, user){
+			if (err) {
+				console.log(err);
 			}
-			res.end(JSON.stringify(docs));
-		}
-	});	
+			console.log(user);
+			if (userScore > user.highScore) {
+				user.highScore = userScore;
+				user.save(function (err, updatedUser){
+					if (err) {
+						console.log(err);
+					}
+					console.log(updatedUser);
+					console.log(`${user.fullName} has a new high score of ${user.highScore}`);
+				});
+			}
+		});
 	},
 
-	addToLeaderBoard: function (req, res, next) {
-		var score = req.body;
-		console.log(score);
-		
-		new LeaderBoard({ 
-			fullName: score.fullName, 
-			score: score.score})
-			.save(function (err) {
+	seeResults: function (req, res, next) {
+		User.find({}, function (err, docs) {
 			if (err) {
 				res.status(504);
 				res.end(err);
 			} else {
-				console.log('Score saved');
-				res.end();
+				for (let i = 0; i < docs.length; i++) {
+				console.log('user:', docs[i].fullName);
+			}
+			res.end(JSON.stringify(docs));
 			}
 		});
+	},
+
+	leaderBoard: function (req, res, next) {
+		User.find({}, function (err, docs) {
+			if (err) {
+				res.status(504);
+				res.end(err);
+			} else {
+				docs.sort((a, b) => b.highScore - a.highScore);
+				res.end(JSON.stringify(docs.slice(0, 10)));
+				console.log(docs);
+			}
+		});	
 	}
 }

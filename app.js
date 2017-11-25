@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const bodyParser= require('body-parser');
 
 const globalAlignment = require('./alignment/global');
@@ -18,6 +19,13 @@ app.use(function(req, res, next) {
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
+//use sessions for tracking logins
+app.use(session({
+  secret: 'work hard',
+  resave: true,
+  saveUninitialized: false
+}));
+
 //GET requests for development 
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/dummyHTML/index.html');
@@ -34,25 +42,32 @@ app.get('/login', function (req, res) {
 //User requests
 app.post('/signup', user.createUsers);
 app.post('/login', user.login);
+app.get('/logout', user.logout);
 app.get('/seeResults', user.seeResults);
+
 //Leaderboard
-app.post('/add', user.addToLeaderBoard);
 app.get('/leaderboard', user.leaderBoard);
 
 
 //Alignment requests
-app.post('/global', (req, res) => {
-	var result = globalAlignment.getGlobalAlignment(req.body.query, req.body.database, req.body.gap);
-	return res.json(result);
-});
 
-app.post('/local', (req, res) => {
-	var result = localAlignment.getLocalAlignment(req.body.query, req.body.database, req.body.gap);
-	return res.json(result);
+//TODO: Update local to return user score. 
+app.post('/alignment', (req, res) => {
+	const request = req.body;
+	if (request.alignment === "global") {
+		var result = globalAlignment.getGlobalAlignment(request.query, request.database, request.gap, request.userScore);
+		if (request.id) user.updateScore(request.id, result.score);
+		return res.json(result);
+	} else if (request.alignment === "local") {
+		var result = localAlignment.getLocalAlignment(request.query, request.database, request.gap, request.userScore);
+		if (request.id) user.updateScore(request.id, result.score);
+		return res.json(result);	
+	}
+	
 });
 
 app.listen(4200, function () {
-  console.log('Protein alignment tutor listening on port 3000!');
+  console.log('Protein alignment tutor listening on port 4200!');
 });
 
 /*
