@@ -51,7 +51,6 @@ module.exports = {
         				err.status = 401;
         				return next(err);
       				} else {
-				        req.session.userId = user._id;
 				        res.status(200);
 				        res.end(JSON.stringify(user));
       				}
@@ -77,15 +76,38 @@ module.exports = {
 		}
 	},
 
-	updateScore: function (userId, userScore) {
-		console.log(userId);
+	updateScore: function (userId, result) {
 		User.findById(userId, function (err, user){
 			if (err) {
 				console.log(err);
 			}
-			console.log(user);
-			if (userScore > user.highScore) {
-				user.highScore = userScore;
+			
+			var historyEntry = {
+				alignmentType: result.type,
+				query: result.query, 
+				database: result.database, 
+				queryStart: result.queryStart, 
+				databaseStart: result.databaseStart, 
+				queryAlignment: result.alignedQuery, 
+				databaseAlignment: result.alignedDatabase, 
+				date: new Date().toDateString(), 
+				score: result.score, 
+				userScore: result.userScore
+			}
+
+			console.log(historyEntry);
+			if (result.userScore > user.highScore) {
+				user.highScore = result.userScore;
+				user.history.push(historyEntry);
+				user.save(function (err, updatedUser){
+					if (err) {
+						console.log(err);
+					}
+					console.log(updatedUser.history);
+					console.log(`${user.fullName} has a new high score of ${user.highScore}`);
+				});
+			} else {
+				user.history.push(historyEntry);
 				user.save(function (err, updatedUser){
 					if (err) {
 						console.log(err);
@@ -122,5 +144,17 @@ module.exports = {
 				console.log(docs);
 			}
 		});	
+	},
+
+	getHistory: function (req, res, next) {
+		User.findById(req.query.userId, function (err, user){
+			if (err) {
+				console.log(err);
+			}
+			else {
+				res.status(200);
+				res.end(JSON.stringify(user.history));
+			}
+		});
 	}
 }

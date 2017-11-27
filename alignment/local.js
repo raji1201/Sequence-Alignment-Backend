@@ -26,6 +26,7 @@ var getLocalAlignment = (query, database, gap, userScore) => {
 	database = database.replace(/\s+/gi, "");
 	gap = parseInt(gap);
 
+	console.log(`${query} ${database}`);
 	var m = query.length + 1;
 	var n = database.length + 1;
 	
@@ -45,7 +46,7 @@ var getLocalAlignment = (query, database, gap, userScore) => {
 			let u = matrix[i - 1][j] + gap;
 			let d = matrix [i - 1][j - 1] + utils.getDiagonalScore(query.charAt(i - 1), database.charAt(j - 1), alphabet, scoringMatrix);
 			var val = Math.max(l, u, d, 0);
-
+			debugger;
 			if (val == l) {
 				matrix[i][j] = l;
 				directionMatrix[i][j] = 'l';
@@ -53,6 +54,7 @@ var getLocalAlignment = (query, database, gap, userScore) => {
 					max = val;
 					maxI = i;
 					maxJ = j;
+					console.log(`maxI: ${maxI}, maxJ: ${maxJ}`);
 				}
 				continue;
 			}
@@ -64,6 +66,7 @@ var getLocalAlignment = (query, database, gap, userScore) => {
 					max = val;
 					maxI = i;
 					maxJ = j;
+					console.log(`maxI: ${maxI}, maxJ: ${maxJ}`);
 				}
 				continue;
 			}
@@ -75,6 +78,7 @@ var getLocalAlignment = (query, database, gap, userScore) => {
 					max = val;
 					maxI = i;
 					maxJ = j;
+					console.log(`maxI: ${maxI}, maxJ: ${maxJ}`);
 				}
 				continue;
 			}
@@ -92,9 +96,11 @@ var getLocalAlignment = (query, database, gap, userScore) => {
 	var queryStart = 0;
 	var databaseStart = 0;
 
-	j = maxI;
-	i = maxJ;
+	var i = maxI;
+	var j = maxJ;
 
+	console.log(i, j);
+	console.log(directionMatrix);
 	while (i > 0 && j > 0 && directionMatrix[i][j] !== 'i') {
 		queryStart = i;
 		databaseStart = j;
@@ -142,7 +148,11 @@ var getLocalAlignment = (query, database, gap, userScore) => {
 		userScore = 100;
 	}
 
+	localAlignmentResult.type = 'local';
 	localAlignmentResult.score = matrix[maxI][maxJ];
+	localAlignmentResult.query = query;
+	localAlignmentResult.gap = gap;
+	localAlignmentResult.database = database;
 	localAlignmentResult.queryStart = queryStart;
 	localAlignmentResult.databaseStart = databaseStart;
 	localAlignmentResult.alignedQuery = queryString;
@@ -150,10 +160,10 @@ var getLocalAlignment = (query, database, gap, userScore) => {
 	localAlignmentResult.matrix = matrix;
 	localAlignmentResult.userScore = userScore;
 
-	console.log(matrix[maxI][maxJ]);
+	/*console.log(matrix[maxI][maxJ]);
 	console.log('Query start: ' + queryStart + ' Database start: ' + databaseStart);
 	console.log('Aligned Query String: ' + queryString + '\n Aligned Database String: ' + databaseString);
-
+*/
 	return localAlignmentResult;
 
 }

@@ -39,6 +39,7 @@ var getGlobalAlignment = (query, database, gap, userScore) => {
 			let l = matrix[i][j - 1] + gap;
 			let u = matrix[i - 1][j] + gap;
 			let d = matrix [i - 1][j - 1] + utils.getDiagonalScore(query.charAt(i - 1), database.charAt(j - 1), alphabet, scoringMatrix);
+
 			if (l >= u) {
 				if (l >= d) {
 					matrix[i][j] = l;
@@ -112,8 +113,12 @@ var getGlobalAlignment = (query, database, gap, userScore) => {
 	} else if (absAlignmentScore === absUserScore) {
 		userScore = 100;
 	}
-
+	console.log(database);
+	globalAlignmentResult.type = 'global';
+	globalAlignmentResult.gap = gap;
 	globalAlignmentResult.score = alignmentScore;
+	globalAlignmentResult.query = query;
+	globalAlignmentResult.database = database;
 	globalAlignmentResult.queryStart = 0;
 	globalAlignmentResult.databaseStart = 0;
 	globalAlignmentResult.alignedQuery = queryString;
@@ -121,9 +126,9 @@ var getGlobalAlignment = (query, database, gap, userScore) => {
 	globalAlignmentResult.matrix = matrix;
 	globalAlignmentResult.userScore = userScore;
 
-	console.log(matrix[m-1][n-1]);
+	/*console.log(matrix[m-1][n-1]);
 	console.log('Aligned Query String: ' + queryString + '\n Aligned Database String: ' + databaseString);
-
+*/
 	return globalAlignmentResult;
 }
 

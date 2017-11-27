@@ -44,6 +44,8 @@ module.exports.initializeDirectionMatrix = initializeDirectionMatrix;
 var getDiagonalScore = (q, d, alphabet, scoringMatrix) => {
 	let a = 0, b = 0;
 	
+	q = q.toLowerCase();
+	d = d.toLowerCase();
 	alphabet = alphabet.toLowerCase();	
 	for (let i = 0; i < alphabet.length; i++) {
 		if (q === alphabet.charAt(i)) a = i;
@@ -52,7 +54,8 @@ var getDiagonalScore = (q, d, alphabet, scoringMatrix) => {
 	for (let i = 0; i < alphabet.length; i++) {
 		if (d === alphabet.charAt(i)) b = i;
 	}
-
+/*
+	console.log(`q: ${q}, d: ${d}, score: ${scoringMatrix[a][b]} a:${a} b:${b}`);*/
 	return scoringMatrix[a][b];
 }
 

@@ -44,6 +44,7 @@ app.post('/signup', user.createUsers);
 app.post('/login', user.login);
 app.get('/logout', user.logout);
 app.get('/seeResults', user.seeResults);
+app.get('/profile', user.getHistory);
 
 //Leaderboard
 app.get('/leaderboard', user.leaderBoard);
@@ -56,11 +57,12 @@ app.post('/alignment', (req, res) => {
 	const request = req.body;
 	if (request.alignment === "global") {
 		var result = globalAlignment.getGlobalAlignment(request.query, request.database, request.gap, request.userScore);
-		if (request.id) user.updateScore(request.id, result.score);
+		console.log(result);
+		if (request.id) user.updateScore(request.id, result);
 		return res.json(result);
 	} else if (request.alignment === "local") {
 		var result = localAlignment.getLocalAlignment(request.query, request.database, request.gap, request.userScore);
-		if (request.id) user.updateScore(request.id, result.score);
+		if (request.id) user.updateScore(request.id, result);
 		return res.json(result);	
 	}
 	

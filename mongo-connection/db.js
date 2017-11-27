@@ -25,7 +25,7 @@ var User = new mongoose.Schema({
   		type:Number,
   		default: 0
   	},
-  	history: [{query: String, database: String, alignment: String, date: Date, score: Number, userScore: Number}],
+  	history: [{}],
 });
 
 //authenticate input against database
@@ -37,36 +37,17 @@ User.statics.authenticate = function (email, password, callback) {
         	var err = new Error('User not found.');
 		    err.status = 401;
 		    return callback(err);
-      	}
-      	bcrypt.compare(password, user.password, function (err, result) {
-        	if (result === true) {
-        		return callback(null, user);
-        	} else {
-          		return callback();
-        	}
-      	});
+      	} else if (user.password === password) {
+      		return callback(null, user);
+    	} else {
+    		return callback();
+    	}
   	});
 }
 
-//hashing a password before saving it to the database
-User.pre('save', function (next) {
-  	var user = this;
-  	bcrypt.hash(user.password, 10, function (err, hash) {
-    	if (err) {
-      		return next(err);
-    	}
-    	user.password = hash;
-    	next();
-  	});
-  	bcrypt.hash(user.verifyPassword, 10, function (err, hash) {
-    	if (err) {
-      		return next(err);
-    	}
-    	user.verifyPassword = hash;
-    	next();
-  	});
-});
 
 var User = mongoose.model('User', User);  
 module.exports = User;
 mongoose.connect('mongodb://localhost/'); 
+
+//[{query: String, database: String, queryStart: Number, databaseStart: Number, queryAlignment: String, databaseAlignment: String, date: Date, score: Number, userScore: Number}]
