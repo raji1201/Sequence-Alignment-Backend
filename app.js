@@ -51,21 +51,41 @@ app.get('/leaderboard', user.leaderBoard);
 
 
 //Alignment requests
-
-//TODO: Update local to return user score. 
+ 
 app.post('/alignment', (req, res) => {
 	const request = req.body;
 	if (request.alignment === "global") {
 		var result = globalAlignment.getGlobalAlignment(request.query, request.database, request.gap, request.userScore);
 		console.log(result);
-		if (request.id) user.updateScore(request.id, result);
+		if (request.id) {
+			if (request.mode !== "game") {
+				result.mode = request.mode;
+				result.userScore = 0;	
+				user.updateScore(request.id, result);
+			}
+		}
 		return res.json(result);
 	} else if (request.alignment === "local") {
 		var result = localAlignment.getLocalAlignment(request.query, request.database, request.gap, request.userScore);
-		if (request.id) user.updateScore(request.id, result);
+		if (request.id) {
+			if (request.mode !== "game") {
+				result.mode = request.mode;
+				result.userScore = 0;	
+				user.updateScore(request.id, result);
+			}
+		}
 		return res.json(result);	
 	}
 	
+});
+
+//Update Game Scores
+app.post('/updateGameScore', (req, res) => {
+	const request = req.body;
+
+	if (request.id) {
+		user.updateGameScore(request.id, request);
+	}
 });
 
 app.listen(4200, function () {

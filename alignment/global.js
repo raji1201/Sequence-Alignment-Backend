@@ -10,7 +10,7 @@ const scoringMatrix = [
 var alphabet = 'ACGT';
 const alignment = 'global';
 
-var getGlobalAlignment = (query, database, gap, userScore) => {
+var getGlobalAlignment = (query, database, gap) => {
 	
 	var globalAlignmentResult = {
 		score: NaN,
@@ -66,7 +66,8 @@ var getGlobalAlignment = (query, database, gap, userScore) => {
 	//Populate queryString and databaseString
 	var queryString = "";
 	var databaseString = "";
-	
+	var directionString = "";
+
 	j = n - 1;
 	i = m - 1;
 
@@ -74,17 +75,20 @@ var getGlobalAlignment = (query, database, gap, userScore) => {
 		switch (directionMatrix[i][j]) {
 		case 'l': 
 			queryString = '.' + queryString;
+			directionString += "l";
 			databaseString = database.charAt(j - 1) + databaseString;
 			j--;
 			break;
 		case 'u':
 			queryString = query.charAt(i - 1) + queryString;
 			databaseString = '.' + databaseString;
+			directionString += "u";
 			i--;
 			break;
 		case 'd': 
 			queryString = query.charAt(i - 1) + queryString;
 			databaseString = database.charAt(j - 1) + databaseString;
+			directionString += "d";
 			i--;
 			j--;
 			break;
@@ -95,24 +99,19 @@ var getGlobalAlignment = (query, database, gap, userScore) => {
 	while (i > 0) {
 		queryString = query.charAt(i - 1) + queryString;
 		databaseString = '.' + databaseString;
+		directionString += "u";
 		i--;
 	}
 		
 	while (j > 0) {
 		queryString = '.' + queryString;
 		databaseString = database.charAt(j - 1) + databaseString;
+		directionString += "l";
 		j--;
 	}
 
 	var alignmentScore = matrix[m-1][n-1];
-	absAlignmentScore = Math.abs(alignmentScore);
-	absUserScore = Math.abs(userScore);
-
-	if (absAlignmentScore !== absUserScore) {
-		userScore = ((absAlignmentScore - (absAlignmentScore - absUserScore)) / absAlignmentScore * 100);
-	} else if (absAlignmentScore === absUserScore) {
-		userScore = 100;
-	}
+	
 	console.log(database);
 	globalAlignmentResult.type = 'global';
 	globalAlignmentResult.gap = gap;
@@ -124,7 +123,8 @@ var getGlobalAlignment = (query, database, gap, userScore) => {
 	globalAlignmentResult.alignedQuery = queryString;
 	globalAlignmentResult.alignedDatabase = databaseString;
 	globalAlignmentResult.matrix = matrix;
-	globalAlignmentResult.userScore = userScore;
+	globalAlignmentResult.directionString = directionString;
+	globalAlignmentResult.startOfDirectionString = {row: m - 1, column: n - 1};
 
 	/*console.log(matrix[m-1][n-1]);
 	console.log('Aligned Query String: ' + queryString + '\n Aligned Database String: ' + databaseString);

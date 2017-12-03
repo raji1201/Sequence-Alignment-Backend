@@ -11,7 +11,7 @@ var alphabet = 'ACGT';
 
 const alignment = 'local';
 
-var getLocalAlignment = (query, database, gap, userScore) => {
+var getLocalAlignment = (query, database, gap) => {
 
 	var localAlignmentResult = {
 		score: NaN,
@@ -95,6 +95,7 @@ var getLocalAlignment = (query, database, gap, userScore) => {
 	var databaseString = "";
 	var queryStart = 0;
 	var databaseStart = 0;
+	var directionString = "";
 
 	var i = maxI;
 	var j = maxJ;
@@ -109,16 +110,19 @@ var getLocalAlignment = (query, database, gap, userScore) => {
 		case 'l': 
 			queryString = '.' + queryString;
 			databaseString = database.charAt(j - 1) + databaseString;
+			directionString += "l";
 			j--;
 			break;
 		case 'u':
 			queryString = query.charAt(i - 1) + queryString;
 			databaseString = '.' + databaseString;
+			directionString += "u";
 			i--;
 			break;
 		case 'd': 
 			queryString = query.charAt(i - 1) + queryString;
 			databaseString = database.charAt(j - 1) + databaseString;
+			directionString += "d";
 			i--;
 			j--;
 			break;
@@ -129,24 +133,19 @@ var getLocalAlignment = (query, database, gap, userScore) => {
 	while (i > 0) {
 		queryString = query.charAt(i - 1) + queryString;
 		databaseString = '.' + databaseString;
+		directionString += "u";
 		i--;
 	}
 		
 	while (j > 0) {
 		queryString = '.' + queryString;
 		databaseString = database.charAt(j - 1) + databaseString;
+		directionString += "l";
 		j--;
 	}
 
 	var alignmentScore = matrix[maxI][maxJ];
-	absAlignmentScore = Math.abs(alignmentScore);
-	absUserScore = Math.abs(userScore);
-
-	if (absAlignmentScore !== absUserScore) {
-		userScore = ((absAlignmentScore - (absAlignmentScore - absUserScore)) / absAlignmentScore * 100);
-	} else if (absAlignmentScore === absUserScore) {
-		userScore = 100;
-	}
+	
 
 	localAlignmentResult.type = 'local';
 	localAlignmentResult.score = matrix[maxI][maxJ];
@@ -158,7 +157,8 @@ var getLocalAlignment = (query, database, gap, userScore) => {
 	localAlignmentResult.alignedQuery = queryString;
 	localAlignmentResult.alignedDatabase = databaseString;
 	localAlignmentResult.matrix = matrix;
-	localAlignmentResult.userScore = userScore;
+	localAlignmentResult.directionString = directionString;
+	localAlignmentResult.startOfDirectionString = [maxI, maxJ];
 
 	/*console.log(matrix[maxI][maxJ]);
 	console.log('Query start: ' + queryStart + ' Database start: ' + databaseStart);

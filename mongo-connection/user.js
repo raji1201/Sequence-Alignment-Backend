@@ -92,7 +92,8 @@ module.exports = {
 				databaseAlignment: result.alignedDatabase, 
 				date: new Date().toDateString(), 
 				score: result.score, 
-				userScore: result.userScore
+				userScore: result.userScore,
+				mode: result.mode
 			}
 
 			console.log(historyEntry);
@@ -114,6 +115,49 @@ module.exports = {
 					}
 					console.log(updatedUser);
 					console.log(`${user.fullName} has a new high score of ${user.highScore}`);
+				});
+			}
+		});
+	},
+
+	updateGameScore: function (userId, result) {
+		User.findById(userId, function (err, user){
+			if (err) {
+				console.log(err);
+			}
+			
+			var historyEntry = {
+				alignmentType: result.type,
+				query: result.query, 
+				database: result.database, 
+				queryStart: result.queryStart, 
+				databaseStart: result.databaseStart, 
+				queryAlignment: result.alignedQuery, 
+				databaseAlignment: result.alignedDatabase, 
+				date: new Date().toDateString(), 
+				score: result.score, 
+				userScore: result.userScore,
+				mode: result.mode
+			}
+
+			console.log(historyEntry);
+			if (result.userScore > user.highScore) {
+				user.highScore = result.userScore;
+				user.history.push(historyEntry);
+				user.save(function (err, updatedUser){
+					if (err) {
+						console.log(err);
+					}
+					console.log(updatedUser.history);
+					console.log(`${user.fullName} has a new high score of ${user.highScore}`);
+				});
+			} else {
+				user.history.push(historyEntry);
+				user.save(function (err, updatedUser){
+					if (err) {
+						console.log(err);
+					}
+					console.log(updatedUser);
 				});
 			}
 		});
