@@ -97,7 +97,7 @@ module.exports = {
 			}
 
 			console.log(historyEntry);
-			if (result.userScore > user.highScore) {
+			if (result.userScore > user.highScore && user.highScore != null) {
 				user.highScore = result.userScore;
 				user.history.push(historyEntry);
 				user.save(function (err, updatedUser){
