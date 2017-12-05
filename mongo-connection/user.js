@@ -96,27 +96,16 @@ module.exports = {
 				mode: result.mode
 			}
 
-			console.log(historyEntry);
-			if (result.userScore > user.highScore && user.highScore != null) {
-				user.highScore = result.userScore;
-				user.history.push(historyEntry);
-				user.save(function (err, updatedUser){
-					if (err) {
-						console.log(err);
-					}
-					console.log(updatedUser.history);
-					console.log(`${user.fullName} has a new high score of ${user.highScore}`);
-				});
-			} else {
-				user.history.push(historyEntry);
-				user.save(function (err, updatedUser){
-					if (err) {
-						console.log(err);
-					}
-					console.log(updatedUser);
-					console.log(`${user.fullName} has a new high score of ${user.highScore}`);
-				});
-			}
+			
+			user.history.push(historyEntry);
+			user.save(function (err, updatedUser){
+				if (err) {
+					console.log(err);
+				}
+				console.log(updatedUser);
+				console.log(`${user.fullName} has a new high score of ${user.highScore}`);
+			});
+			
 		});
 	},
 
