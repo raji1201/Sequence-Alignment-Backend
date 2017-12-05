@@ -158,8 +158,8 @@ var getLocalAlignment = (query, database, gap) => {
 	localAlignmentResult.alignedDatabase = databaseString;
 	localAlignmentResult.matrix = matrix;
 	localAlignmentResult.directionString = directionString;
-	localAlignmentResult.startOfDirectionString = [maxI, maxJ];
-
+	localAlignmentResult.startOfDirectionString = {row: maxI, column: maxJ};
+	
 	/*console.log(matrix[maxI][maxJ]);
 	console.log('Query start: ' + queryStart + ' Database start: ' + databaseStart);
 	console.log('Aligned Query String: ' + queryString + '\n Aligned Database String: ' + databaseString);
